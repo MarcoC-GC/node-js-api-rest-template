@@ -1,24 +1,51 @@
-import express, { Request, Response } from 'express'
-import dotenv from 'dotenv'
+/**
+ * Application Entry Point
+ *
+ * Bootstrap sequence:
+ * 1. Load and validate configuration
+ * 2. Setup dependency injection container
+ * 3. Create and start application
+ * 4. Setup graceful shutdown handlers
+ */
 
-dotenv.config()
+import { Config } from '@/config'
+import { Container } from '@/config/container'
+import { App } from './app'
 
-const app = express()
-const PORT = process.env.PORT || 3000
+/**
+ * Bootstrap the application
+ */
+async function bootstrap(): Promise<void> {
+  try {
+    // 1. Load configuration
+    const config = Config.load()
 
-// Middleware
-app.use(express.json())
+    // 2. Setup dependency injection
+    Container.setup(config)
 
-// Routes
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'API REST con Node.js y TypeScript' })
-})
+    // 3. Create application
+    const app = new App()
 
-app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'OK' })
-})
+    // 4. Setup graceful shutdown
+    process.on('SIGTERM', async () => {
+      console.log('SIGTERM received, shutting down...')
+      await app.shutdown()
+      process.exit(0)
+    })
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`)
-})
+    process.on('SIGINT', async () => {
+      console.log('SIGINT received, shutting down...')
+      await app.shutdown()
+      process.exit(0)
+    })
+
+    // 5. Start application
+    await app.start()
+  } catch (error) {
+    console.error('Failed to start application:', error)
+    process.exit(1)
+  }
+}
+
+// Start the application
+bootstrap()
