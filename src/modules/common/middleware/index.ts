@@ -32,12 +32,12 @@
  */
 
 // Interfaces
-export { IMiddleware } from './middleware.interface'
-export { IErrorMiddleware } from './error-middleware.interface'
+export * from './middleware.interface'
+export * from './error-middleware.interface'
 
 // Implementations
-export { RequestIdMiddleware } from './request-id.middleware'
-export { LoggerMiddleware } from './logger.middleware'
-export { CorsMiddleware } from './cors.middleware'
-export { ErrorHandlerMiddleware } from './error-handler.middleware'
-export { NotFoundMiddleware } from './not-found.middleware'
+export * from './request-id.middleware'
+export * from './logger.middleware'
+export * from './cors.middleware'
+export * from './error-handler.middleware'
+export * from './not-found.middleware'

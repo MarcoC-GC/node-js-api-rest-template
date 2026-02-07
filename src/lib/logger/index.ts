@@ -1,2 +1,2 @@
-export { ILogger } from './logger.interface'
-export { ConsoleLogger, type LogLevel } from './console.logger'
+export * from './logger.interface'
+export * from './console.logger'
