@@ -101,3 +101,6 @@ export class Config {
     }
   }
 }
+
+// Export tokens for dependency injection
+export { TOKENS, type Token } from './tokens'

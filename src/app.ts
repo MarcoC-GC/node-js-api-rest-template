@@ -1,6 +1,7 @@
 import express, { Express } from 'express'
 import { Config } from '@/config'
 import { Container } from '@/config/container'
+import { TOKENS } from '@/config/tokens'
 import { ILogger } from '@/lib/logger'
 import {
   RequestIdMiddleware,
@@ -36,8 +37,8 @@ export class App {
 
   constructor() {
     // Resolve dependencies from container
-    this.config = Container.resolve<Config>('Config')
-    this.logger = Container.resolve<ILogger>('ILogger')
+    this.config = Container.resolve<Config>(TOKENS.Config)
+    this.logger = Container.resolve<ILogger>(TOKENS.ILogger)
 
     // Create Express app
     this.app = express()
@@ -60,15 +61,15 @@ export class App {
     this.app.use(express.urlencoded({ extended: true }))
 
     // CORS (must be first to handle preflight requests)
-    const corsMiddleware = Container.resolve<CorsMiddleware>('CorsMiddleware')
+    const corsMiddleware = Container.resolve<CorsMiddleware>(TOKENS.CorsMiddleware)
     this.app.use(corsMiddleware.handle.bind(corsMiddleware))
 
     // Request ID (must be early to be available in all logs)
-    const requestIdMiddleware = Container.resolve<RequestIdMiddleware>('RequestIdMiddleware')
+    const requestIdMiddleware = Container.resolve<RequestIdMiddleware>(TOKENS.RequestIdMiddleware)
     this.app.use(requestIdMiddleware.handle.bind(requestIdMiddleware))
 
     // Logger (after requestId to include it in logs)
-    const loggerMiddleware = Container.resolve<LoggerMiddleware>('LoggerMiddleware')
+    const loggerMiddleware = Container.resolve<LoggerMiddleware>(TOKENS.LoggerMiddleware)
     this.app.use(loggerMiddleware.handle.bind(loggerMiddleware))
 
     this.logger.info('Global middlewares configured')
@@ -99,8 +100,8 @@ export class App {
 
     // TODO: Register module routes
     // Example:
-    // const authRoutes = Container.resolve('AuthRoutes')
-    // const userRoutes = Container.resolve('UserRoutes')
+    // const authRoutes = Container.resolve(TOKENS.AuthRoutes)
+    // const userRoutes = Container.resolve(TOKENS.UserRoutes)
     // this.app.use('/api/v1/auth', authRoutes)
     // this.app.use('/api/v1/users', userRoutes)
 
@@ -113,12 +114,13 @@ export class App {
    */
   private setupErrorHandlers(): void {
     // 404 handler for undefined routes (before error handler)
-    const notFoundMiddleware = Container.resolve<NotFoundMiddleware>('NotFoundMiddleware')
+    const notFoundMiddleware = Container.resolve<NotFoundMiddleware>(TOKENS.NotFoundMiddleware)
     this.app.use(notFoundMiddleware.handle.bind(notFoundMiddleware))
 
     // Global error handler (MUST BE LAST)
-    const errorHandlerMiddleware =
-      Container.resolve<ErrorHandlerMiddleware>('ErrorHandlerMiddleware')
+    const errorHandlerMiddleware = Container.resolve<ErrorHandlerMiddleware>(
+      TOKENS.ErrorHandlerMiddleware
+    )
     this.app.use(errorHandlerMiddleware.handle.bind(errorHandlerMiddleware))
 
     this.logger.info('Error handlers configured')
@@ -139,7 +141,7 @@ export class App {
     const port = this.config.port
 
     // TODO: Connect to database
-    // const prisma = Container.resolve('PrismaClient')
+    // const prisma = Container.resolve(TOKENS.PrismaClient)
     // await prisma.$connect()
     // this.logger.info('Database connected')
 
@@ -159,7 +161,7 @@ export class App {
     this.logger.info('Shutting down gracefully...')
 
     // TODO: Close database connection
-    // const prisma = Container.resolve('PrismaClient')
+    // const prisma = Container.resolve(TOKENS.PrismaClient)
     // await prisma.$disconnect()
     // this.logger.info('Database disconnected')
 
