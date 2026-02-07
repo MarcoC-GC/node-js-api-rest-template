@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { IErrorMiddleware } from './error-middleware.interface'
 import { ILogger } from '@/lib/logger'
 import { BaseError } from '@/lib/errors'
-import { ErrorMapper, type ErrorMapperOptions } from '@/lib/errors/error-mapper'
+import { ErrorMapper, type ErrorMapperOptions } from '@/modules/common/mappers'
 
 /**
  * ErrorHandlerMiddleware - Global error handler

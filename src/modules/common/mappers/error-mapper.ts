@@ -1,11 +1,10 @@
-import { BaseError } from './base-error'
+import { BaseError } from '@/lib/errors'
 import { ValidationError } from '@/modules/common/errors/validation.error'
 import { NotFoundError } from '@/modules/common/errors/not-found.error'
 import { UnauthorizedError } from '@/modules/common/errors/unauthorized.error'
 import { ForbiddenError } from '@/modules/common/errors/forbidden.error'
 import { ConflictError } from '@/modules/common/errors/conflict.error'
-import { ProblemDetails } from './problem-details'
-import { ProblemDetailsBuilder } from './problem-details.builder'
+import { ProblemDetails, ProblemDetailsBuilder } from '@/lib/errors'
 
 /**
  * Options for converting errors to Problem Details
@@ -34,10 +33,15 @@ export interface ErrorMapperOptions {
 }
 
 /**
- * ErrorMapper - Converts errors to RFC 9457 Problem Details
+ * ErrorMapper - Converts application errors to RFC 9457 Problem Details
  *
  * Maps application errors (BaseError and subclasses) to standardized
  * Problem Details format. Handles both expected errors and unexpected errors.
+ *
+ * This mapper is application-specific because it knows about:
+ * - ValidationError, NotFoundError, etc (common errors)
+ * - How to extract custom fields from each error type
+ * - Business context requirements
  *
  * Features:
  * - Automatic type URI generation from error codes
@@ -131,6 +135,9 @@ export class ErrorMapper {
 
   /**
    * Get error-specific extension fields
+   *
+   * This method knows about all common error types and extracts
+   * their specific fields for the Problem Details extensions.
    */
   private static getErrorExtensions(
     error: BaseError,

@@ -50,7 +50,6 @@ export * from './infrastructure-error'
 // Context and types
 export * from './error-context'
 
-// RFC 9457 Problem Details
+// RFC 9457 Problem Details (framework-agnostic)
 export * from './problem-details'
 export * from './problem-details.builder'
-export * from './error-mapper'
