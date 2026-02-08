@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/generated/prisma'
+import { PrismaClient } from '@/generated/prisma/client'
 import { Result } from '@/lib/result/result'
 import { DatabaseError } from '@/modules/common/errors/database.error'
 import { IPermissionRepository } from '@/modules/identity/domain/repositories/permission.repository.interface'
