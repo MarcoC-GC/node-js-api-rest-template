@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// IDENTITY MODULE - RBAC SYSTEM
+// ============================================================================
+
+/// User entity - Represents authenticated users in the system
+/// Business Rules:
+/// - Email must be unique
+/// - Each user has exactly ONE role (not multiple)
+/// - Soft delete enabled (deletedAt)
+/// - At least one SUPER_ADMIN must exist
+model User {
+  id        String  @id @default(uuid()) @db.Uuid
+  email     String  @unique @db.VarChar(255)
+  password  String  @db.VarChar(255) // Bcrypt hash
+  firstName String  @map("first_name") @db.VarChar(100)
+  lastName  String  @map("last_name") @db.VarChar(100)
+  isActive  Boolean @default(true) @map("is_active")
+
+  // ONE role per user (FK, not M2M)
+  roleId String @map("role_id") @db.Uuid
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([email])
+  @@index([roleId])
+  @@index([deletedAt])
+  @@index([isActive])
+  @@map("users")
+}
+
+/// Role entity - Groups permissions together
+/// Business Rules:
+/// - Name must be unique
+/// - System roles (isSystem=true) cannot be modified or deleted
+/// - Custom roles can be created by admins
+model Role {
+  id          String @id @default(uuid()) @db.Uuid
+  name        String @unique @db.VarChar(50) // e.g., SUPER_ADMIN, ADMIN, USER
+  description String @db.VarChar(255)
+
+  // Flag to protect system roles from modification
+  isSystem Boolean @default(false) @map("is_system")
+
+  // Relationships
+  users       User[]
+  permissions Permission[] @relation("RolePermissions")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([name])
+  @@index([isSystem])
+  @@map("roles")
+}
+
+/// Permission entity - Granular permissions in format "resource:action"
+/// Business Rules:
+/// - Resource:action pair must be unique
+/// - Permissions are read-only (created via seeds only)
+/// - Supports wildcards: "*:*", "users:*", "*:read"
+model Permission {
+  id          String @id @default(uuid()) @db.Uuid
+  resource    String @db.VarChar(50) // e.g., "users", "roles", "*"
+  action      String @db.VarChar(50) // e.g., "create", "read", "update", "delete", "*"
+  description String @db.VarChar(255)
+
+  // Relationships
+  roles Role[] @relation("RolePermissions")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([resource, action], name: "unique_permission_code")
+  @@index([resource])
+  @@map("permissions")
+}
