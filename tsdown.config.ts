@@ -9,5 +9,6 @@ export default defineConfig({
   alias: {
     '@': './src' // Mapea tu alias de TS aquí también
   },
+  minify: true, // Minifica el código de salida
   platform: 'node'
 })
