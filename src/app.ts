@@ -1,6 +1,8 @@
 import express, { Express } from 'express'
 import { container } from 'tsyringe'
+import { apiReference } from '@scalar/express-api-reference'
 import { Config, TOKENS } from '@/config'
+import { swaggerSpec } from '@/config/swagger'
 import { ILogger } from '@/lib/logger'
 import { CorsMiddleware } from '@/modules/common/middleware/cors.middleware'
 import { RequestIdMiddleware } from '@/modules/common/middleware/request-id.middleware'
@@ -98,7 +100,48 @@ export class App {
    * Setup application routes
    */
   private setupRoutes(): void {
-    // Health check endpoint
+    /**
+     * @openapi
+     * /health:
+     *   get:
+     *     summary: Health check
+     *     description: Check if the API is running and healthy. Returns current status, timestamp, request ID, and environment.
+     *     tags:
+     *       - Health
+     *     responses:
+     *       200:
+     *         description: API is healthy and operational
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               required:
+     *                 - status
+     *                 - timestamp
+     *                 - requestId
+     *                 - environment
+     *               properties:
+     *                 status:
+     *                   type: string
+     *                   enum: [ok]
+     *                   description: Health status
+     *                   example: ok
+     *                 timestamp:
+     *                   type: string
+     *                   format: date-time
+     *                   description: Current server timestamp
+     *                   example: 2026-02-08T01:37:15.808Z
+     *                 requestId:
+     *                   type: string
+     *                   format: uuid
+     *                   description: Unique request identifier
+     *                   example: a7ff6019-a9ec-4219-9203-89545a8fce5a
+     *                 environment:
+     *                   type: string
+     *                   enum: [development, production, test]
+     *                   description: Current environment
+     *                   example: development
+     */
     this.app.get('/health', (req, res) => {
       res.json({
         status: 'ok',
@@ -108,7 +151,6 @@ export class App {
       })
     })
 
-    // Root endpoint
     this.app.get('/', (req, res) => {
       res.json({
         message: 'Node.js REST API Template',
@@ -116,6 +158,20 @@ export class App {
         documentation: '/api/docs'
       })
     })
+
+    // OpenAPI JSON specification endpoint
+    this.app.get('/api/docs/openapi.json', (req, res) => {
+      res.setHeader('Content-Type', 'application/json')
+      res.json(swaggerSpec)
+    })
+
+    // Scalar API documentation UI
+    this.app.use(
+      '/api/docs',
+      apiReference({
+        url: '/api/docs/openapi.json'
+      })
+    )
 
     // Register module routes
     this.app.use('/api/permissions', this.permissionsRoutes.getRouter())
