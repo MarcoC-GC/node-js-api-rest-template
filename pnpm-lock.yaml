@@ -23,9 +23,6 @@ importers:
       dotenv:
         specifier: ^17.2.4
         version: 17.2.4
-      eslint-config-love:
-        specifier: ^149.0.0
-        version: 149.0.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       express:
         specifier: ^5.2.1
         version: 5.2.1
@@ -87,6 +84,9 @@ importers:
       eslint:
         specifier: ^9.39.2
         version: 9.39.2(jiti@2.6.1)
+      eslint-config-love:
+        specifier: ^149.0.0
+        version: 149.0.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.2(jiti@2.6.1))
