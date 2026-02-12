@@ -17,8 +17,14 @@ export const IDENTITY_TOKENS = {
   RoleRepository: Symbol.for('Identity.RoleRepository'),
   UserRepository: Symbol.for('Identity.UserRepository'),
 
-  // ── Domain Services ─────────────────────────────────────────────────
-  AuthorizationService: Symbol.for('Identity.AuthorizationService'),
+  // ── Infrastructure Services ─────────────────────────────────────────
+  JwtService: Symbol.for('Identity.JwtService'),
+
+  // ── Use Cases — Authorization ───────────────────────────────────────
+  CheckPermissionUseCase: Symbol.for('Identity.CheckPermissionUseCase'),
+
+  // ── Use Cases — Users ───────────────────────────────────────────────
+  GetActiveUserByIdUseCase: Symbol.for('Identity.GetActiveUserByIdUseCase'),
 
   // ── Use Cases — Permissions ─────────────────────────────────────────
   GetPermissionByIdUseCase: Symbol.for('Identity.GetPermissionByIdUseCase'),
@@ -28,5 +34,9 @@ export const IDENTITY_TOKENS = {
   PermissionsController: Symbol.for('Identity.PermissionsController'),
 
   // ── Routes ──────────────────────────────────────────────────────────
-  PermissionsRoutes: Symbol.for('Identity.PermissionsRoutes')
+  PermissionsRoutes: Symbol.for('Identity.PermissionsRoutes'),
+
+  // ── Middlewares ─────────────────────────────────────────────────────
+  AuthenticationMiddleware: Symbol.for('Identity.AuthenticationMiddleware'),
+  AuthorizationMiddleware: Symbol.for('Identity.AuthorizationMiddleware')
 } as const

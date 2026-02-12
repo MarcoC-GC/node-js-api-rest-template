@@ -1,21 +1,36 @@
 import { DependencyContainer } from 'tsyringe'
 import { PrismaClient } from '@/generated/prisma/client'
 import { TOKENS } from '@/config/tokens'
+import { Config } from '@/config'
 import { IDENTITY_TOKENS } from './identity.tokens'
 
 // Domain — Repository interfaces
 import { IPermissionRepository } from './domain/repositories/permission.repository.interface'
+import { IUserRepository } from './domain/repositories/user.repository.interface'
+import { IRoleRepository } from './domain/repositories/role.repository.interface'
 
 // Application — Use Cases
 import { GetPermissionByIdUseCase } from './application/permissions/use-cases/get-permission-by-id.use-case'
 import { ListPermissionsUseCase } from './application/permissions/use-cases/list-permissions.use-case'
+import { CheckPermissionUseCase } from './application/authorization/use-cases/check-permission.use-case'
+import { GetActiveUserByIdUseCase } from './application/users/use-cases/get-active-user-by-id.use-case'
+
+// Application — Services
+import { IJwtService } from './application/services/jwt.service.interface'
 
 // Infrastructure — Persistence
 import { PermissionRepositoryImpl } from './infrastructure/persistence/prisma/permission.repository.impl'
+import { UserRepositoryImpl } from './infrastructure/persistence/prisma/user.repository.impl'
+import { RoleRepositoryImpl } from './infrastructure/persistence/prisma/role.repository.impl'
+
+// Infrastructure — Services
+import { JwtService } from './infrastructure/services/jwt.service'
 
 // Infrastructure — HTTP
 import { PermissionsController } from './infrastructure/http/controllers/permissions.controller'
 import { PermissionsRoutes } from './infrastructure/http/routes/permissions.routes'
+import { AuthenticationMiddleware } from './infrastructure/http/middleware/authentication.middleware'
+import { AuthorizationMiddleware } from './infrastructure/http/middleware/authorization.middleware'
 
 /**
  * Identity Module — Dependency Registration
@@ -35,6 +50,49 @@ export function registerIdentityModule(container: DependencyContainer): void {
     useFactory: (c) => {
       const prisma = c.resolve<PrismaClient>(TOKENS.PrismaClient)
       return new PermissionRepositoryImpl(prisma)
+    }
+  })
+
+  container.register<IUserRepository>(IDENTITY_TOKENS.UserRepository, {
+    useFactory: (c) => {
+      const prisma = c.resolve<PrismaClient>(TOKENS.PrismaClient)
+      return new UserRepositoryImpl(prisma)
+    }
+  })
+
+  container.register<IRoleRepository>(IDENTITY_TOKENS.RoleRepository, {
+    useFactory: (c) => {
+      const prisma = c.resolve<PrismaClient>(TOKENS.PrismaClient)
+      return new RoleRepositoryImpl(prisma)
+    }
+  })
+
+  // ── Infrastructure Services ─────────────────────────────────────────
+  container.register<IJwtService>(IDENTITY_TOKENS.JwtService, {
+    useFactory: (c) => {
+      const config = c.resolve<Config>(TOKENS.Config)
+      return new JwtService(config.jwtSecret, config.jwtExpiresIn)
+    }
+  })
+
+  // ── Use Cases — Authorization ───────────────────────────────────────
+  container.register<CheckPermissionUseCase>(IDENTITY_TOKENS.CheckPermissionUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      const permissionRepository = c.resolve<IPermissionRepository>(
+        IDENTITY_TOKENS.PermissionRepository
+      )
+
+      return new CheckPermissionUseCase(userRepository, roleRepository, permissionRepository)
+    }
+  })
+
+  // ── Use Cases — Users ───────────────────────────────────────────────
+  container.register<GetActiveUserByIdUseCase>(IDENTITY_TOKENS.GetActiveUserByIdUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      return new GetActiveUserByIdUseCase(userRepository)
     }
   })
 
@@ -62,11 +120,38 @@ export function registerIdentityModule(container: DependencyContainer): void {
     }
   })
 
+  // ── Middlewares ──────────────────────────────────────────────────────
+  container.register<AuthenticationMiddleware>(IDENTITY_TOKENS.AuthenticationMiddleware, {
+    useFactory: (c) => {
+      const jwtService = c.resolve<IJwtService>(IDENTITY_TOKENS.JwtService)
+      const getActiveUserById = c.resolve<GetActiveUserByIdUseCase>(
+        IDENTITY_TOKENS.GetActiveUserByIdUseCase
+      )
+      return new AuthenticationMiddleware(jwtService, getActiveUserById)
+    }
+  })
+
+  container.register<AuthorizationMiddleware>(IDENTITY_TOKENS.AuthorizationMiddleware, {
+    useFactory: (c) => {
+      const checkPermissionUseCase = c.resolve<CheckPermissionUseCase>(
+        IDENTITY_TOKENS.CheckPermissionUseCase
+      )
+      return new AuthorizationMiddleware(checkPermissionUseCase)
+    }
+  })
+
   // ── Routes ────────────────────────────────────────────────────────────
   container.register<PermissionsRoutes>(IDENTITY_TOKENS.PermissionsRoutes, {
     useFactory: (c) => {
       const controller = c.resolve<PermissionsController>(IDENTITY_TOKENS.PermissionsController)
-      return new PermissionsRoutes(controller)
+      const authentication = c.resolve<AuthenticationMiddleware>(
+        IDENTITY_TOKENS.AuthenticationMiddleware
+      )
+      const authorization = c.resolve<AuthorizationMiddleware>(
+        IDENTITY_TOKENS.AuthorizationMiddleware
+      )
+
+      return new PermissionsRoutes(controller, authentication, authorization)
     }
   })
 }
