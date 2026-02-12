@@ -64,7 +64,9 @@ const SYSTEM_ROLES = [
     description: 'Authenticated user with basic permissions',
     isSystem: true,
     permissions: [
-      'users:read' // Can view own profile
+      'users:read', // Can view own profile
+      'roles:read', // Can view role details (but not manage roles)
+      'permissions:read' // Can view permissions (for transparency)
     ]
   },
   {
