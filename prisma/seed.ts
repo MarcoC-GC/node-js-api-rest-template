@@ -1,4 +1,4 @@
-import { PrismaClient } from '../src/generated/prisma'
+import { PrismaClient } from '../src/generated/prisma/client'
 import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import * as bcrypt from 'bcrypt'
@@ -64,7 +64,9 @@ const SYSTEM_ROLES = [
     description: 'Authenticated user with basic permissions',
     isSystem: true,
     permissions: [
-      'users:read' // Can view own profile
+      'users:read', // Can view own profile
+      'roles:read', // Can view role details (but not manage roles)
+      'permissions:read' // Can view permissions (for transparency)
     ]
   },
   {

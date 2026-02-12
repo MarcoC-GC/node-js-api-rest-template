@@ -1,6 +1,23 @@
 import { Request, Response, NextFunction } from 'express'
+import { z } from 'zod'
 import { GetPermissionByIdUseCase } from '@/modules/identity/application/permissions/use-cases/get-permission-by-id.use-case'
 import { ListPermissionsUseCase } from '@/modules/identity/application/permissions/use-cases/list-permissions.use-case'
+import { ValidationError } from '@/modules/common/errors/validation.error'
+
+const permissionIdParamsSchema = z.object({
+  id: z.uuid()
+})
+
+const paginationQuerySchema = z.object({
+  limit: z.preprocess(
+    (value) => (value === '' || value === undefined || value === null ? undefined : value),
+    z.coerce.number().int().min(1).max(100).optional()
+  ),
+  offset: z.preprocess(
+    (value) => (value === '' || value === undefined || value === null ? undefined : value),
+    z.coerce.number().int().min(0).optional()
+  )
+})
 
 /**
  * Permissions Controller
@@ -47,14 +64,18 @@ export class PermissionsController {
    */
   async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params
+      const paramsResult = permissionIdParamsSchema.safeParse(req.params)
 
-      if (typeof id !== 'string') {
-        res.status(400).json({ error: 'Invalid ID parameter' })
-        return
+      if (!paramsResult.success) {
+        const issue = paramsResult.error.issues[0]
+        return next(
+          new ValidationError('id', issue?.message || 'Invalid ID parameter', {
+            metadata: { issues: paramsResult.error.issues }
+          })
+        )
       }
 
-      const result = await this.getPermissionByIdUseCase.execute(id)
+      const result = await this.getPermissionByIdUseCase.execute(paramsResult.data.id)
 
       if (!result.isSuccess()) {
         next(result.error)
@@ -130,8 +151,18 @@ export class PermissionsController {
    */
   async list(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined
-      const offset = req.query.offset ? parseInt(req.query.offset as string, 10) : undefined
+      const queryResult = paginationQuerySchema.safeParse(req.query)
+
+      if (!queryResult.success) {
+        const issue = queryResult.error.issues[0]
+        return next(
+          new ValidationError(issue?.path.join('.') || 'query', issue?.message || 'Invalid query', {
+            metadata: { issues: queryResult.error.issues }
+          })
+        )
+      }
+
+      const { limit, offset } = queryResult.data
 
       const result = await this.listPermissionsUseCase.execute(limit, offset)
 
