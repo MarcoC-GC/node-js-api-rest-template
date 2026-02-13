@@ -1,5 +1,5 @@
 import { Result } from '@/lib/result/result'
-import { ValidationError } from '../errors/validation.error'
+import { ValidationError } from '../errors/domain/validation.error'
 import { PaginationParams, PaginationMetadata } from '../types/pagination.types'
 import { PaginatedResponseDto } from '../dtos/paginated-response.dto'
 

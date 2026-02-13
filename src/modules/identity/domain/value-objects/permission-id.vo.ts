@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { Result } from '@/lib/result/result'
-import { ValidationError } from '@/modules/common/errors/validation.error'
+import { ValidationError } from '@/modules/common/errors/domain/validation.error'
 
 /**
  * PermissionId - Permission unique identifier Value Object

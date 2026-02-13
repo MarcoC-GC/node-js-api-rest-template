@@ -1,5 +1,5 @@
 import { Result } from '@/lib/result/result'
-import { ValidationError } from '@/modules/common/errors/validation.error'
+import { ValidationError } from '@/modules/common/errors/domain/validation.error'
 import { UserId } from '../value-objects/user-id.vo'
 import { Email } from '../value-objects/email.vo'
 import { Password } from '../value-objects/password.vo'

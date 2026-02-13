@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { UnauthorizedError } from '@/modules/common/errors/unauthorized.error'
 import { ForbiddenError } from '@/modules/common/errors/forbidden.error'
-import { ValidationError } from '@/modules/common/errors/validation.error'
+import { ValidationError } from '@/modules/common/errors/domain/validation.error'
 import { UserId } from '@/modules/identity/domain/value-objects/user-id.vo'
 import { CheckPermissionUseCase } from '@/modules/identity/application/authorization/use-cases/check-permission.use-case'
 

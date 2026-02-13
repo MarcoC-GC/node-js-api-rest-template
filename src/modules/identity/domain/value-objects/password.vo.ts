@@ -1,5 +1,5 @@
 import { Result } from '@/lib/result/result'
-import { ValidationError } from '@/modules/common/errors/validation.error'
+import { ValidationError } from '@/modules/common/errors/domain/validation.error'
 
 /**
  * Password - Password Value Object

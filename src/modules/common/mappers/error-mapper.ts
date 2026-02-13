@@ -1,10 +1,11 @@
 import { BaseError } from '@/lib/errors'
-import { ValidationError } from '@/modules/common/errors/validation.error'
+import { ValidationError } from '@/modules/common/errors/domain/validation.error'
 import { NotFoundError } from '@/modules/common/errors/not-found.error'
 import { UnauthorizedError } from '@/modules/common/errors/unauthorized.error'
 import { ForbiddenError } from '@/modules/common/errors/forbidden.error'
 import { ConflictError } from '@/modules/common/errors/conflict.error'
 import { ProblemDetails, ProblemDetailsBuilder } from '@/lib/errors'
+import { ZodValidationError } from '../errors/infrastructure'
 
 /**
  * Options for converting errors to Problem Details
@@ -175,6 +176,10 @@ export class ErrorMapper {
       extensions.conflictField = error.conflictField
       extensions.conflictValue = error.conflictValue
       extensions.reason = error.reason
+    }
+
+    if (error instanceof ZodValidationError) {
+      extensions.errors = error.errors
     }
 
     // Include context only if requested (development mode)
