@@ -19,9 +19,14 @@ export const IDENTITY_TOKENS = {
 
   // ── Infrastructure Services ─────────────────────────────────────────
   JwtService: Symbol.for('Identity.JwtService'),
+  PasswordHashService: Symbol.for('Identity.PasswordHashService'),
 
   // ── Use Cases — Authorization ───────────────────────────────────────
   CheckPermissionUseCase: Symbol.for('Identity.CheckPermissionUseCase'),
+
+  // ── Use Cases — Auth ────────────────────────────────────────────────
+  RegisterUserUseCase: Symbol.for('Identity.RegisterUserUseCase'),
+  LoginUserUseCase: Symbol.for('Identity.LoginUserUseCase'),
 
   // ── Use Cases — Users ───────────────────────────────────────────────
   GetActiveUserByIdUseCase: Symbol.for('Identity.GetActiveUserByIdUseCase'),
@@ -32,9 +37,11 @@ export const IDENTITY_TOKENS = {
 
   // ── Controllers ─────────────────────────────────────────────────────
   PermissionsController: Symbol.for('Identity.PermissionsController'),
+  AuthController: Symbol.for('Identity.AuthController'),
 
   // ── Routes ──────────────────────────────────────────────────────────
   PermissionsRoutes: Symbol.for('Identity.PermissionsRoutes'),
+  AuthRoutes: Symbol.for('Identity.AuthRoutes'),
 
   // ── Middlewares ─────────────────────────────────────────────────────
   AuthenticationMiddleware: Symbol.for('Identity.AuthenticationMiddleware'),

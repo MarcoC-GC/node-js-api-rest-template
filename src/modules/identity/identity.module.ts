@@ -14,9 +14,12 @@ import { GetPermissionByIdUseCase } from './application/permissions/use-cases/ge
 import { ListPermissionsUseCase } from './application/permissions/use-cases/list-permissions.use-case'
 import { CheckPermissionUseCase } from './application/authorization/use-cases/check-permission.use-case'
 import { GetActiveUserByIdUseCase } from './application/users/use-cases/get-active-user-by-id.use-case'
+import { RegisterUserUseCase } from './application/auth/use-cases/register-user.use-case'
+import { LoginUserUseCase } from './application/auth/use-cases/login-user.use-case'
 
 // Application — Services
 import { IJwtService } from './application/services/jwt.service.interface'
+import { IPasswordHashService } from './application/services/password-hash.service.interface'
 
 // Infrastructure — Persistence
 import { PermissionRepositoryImpl } from './infrastructure/persistence/prisma/permission.repository.impl'
@@ -25,10 +28,13 @@ import { RoleRepositoryImpl } from './infrastructure/persistence/prisma/role.rep
 
 // Infrastructure — Services
 import { JwtService } from './infrastructure/services/jwt.service'
+import { BcryptPasswordHashService } from './infrastructure/services/bcrypt-password-hash.service'
 
 // Infrastructure — HTTP
 import { PermissionsController } from './infrastructure/http/controllers/permissions.controller'
+import { AuthController } from './infrastructure/http/controllers/auth.controller'
 import { PermissionsRoutes } from './infrastructure/http/routes/permissions.routes'
+import { AuthRoutes } from './infrastructure/http/routes/auth.routes'
 import { AuthenticationMiddleware } from './infrastructure/http/middleware/authentication.middleware'
 import { AuthorizationMiddleware } from './infrastructure/http/middleware/authorization.middleware'
 
@@ -75,6 +81,13 @@ export function registerIdentityModule(container: DependencyContainer): void {
     }
   })
 
+  container.register<IPasswordHashService>(IDENTITY_TOKENS.PasswordHashService, {
+    useFactory: (c) => {
+      const config = c.resolve<Config>(TOKENS.Config)
+      return new BcryptPasswordHashService(config.bcryptSaltRounds)
+    }
+  })
+
   // ── Use Cases — Authorization ───────────────────────────────────────
   container.register<CheckPermissionUseCase>(IDENTITY_TOKENS.CheckPermissionUseCase, {
     useFactory: (c) => {
@@ -93,6 +106,29 @@ export function registerIdentityModule(container: DependencyContainer): void {
     useFactory: (c) => {
       const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
       return new GetActiveUserByIdUseCase(userRepository)
+    }
+  })
+
+  // ── Use Cases — Auth ────────────────────────────────────────────────
+  container.register<RegisterUserUseCase>(IDENTITY_TOKENS.RegisterUserUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      const passwordHashService = c.resolve<IPasswordHashService>(
+        IDENTITY_TOKENS.PasswordHashService
+      )
+      return new RegisterUserUseCase(userRepository, roleRepository, passwordHashService)
+    }
+  })
+
+  container.register<LoginUserUseCase>(IDENTITY_TOKENS.LoginUserUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      const passwordHashService = c.resolve<IPasswordHashService>(
+        IDENTITY_TOKENS.PasswordHashService
+      )
+      const jwtService = c.resolve<IJwtService>(IDENTITY_TOKENS.JwtService)
+      return new LoginUserUseCase(userRepository, passwordHashService, jwtService)
     }
   })
 
@@ -117,6 +153,14 @@ export function registerIdentityModule(container: DependencyContainer): void {
       const getById = c.resolve<GetPermissionByIdUseCase>(IDENTITY_TOKENS.GetPermissionByIdUseCase)
       const list = c.resolve<ListPermissionsUseCase>(IDENTITY_TOKENS.ListPermissionsUseCase)
       return new PermissionsController(getById, list)
+    }
+  })
+
+  container.register<AuthController>(IDENTITY_TOKENS.AuthController, {
+    useFactory: (c) => {
+      const registerUser = c.resolve<RegisterUserUseCase>(IDENTITY_TOKENS.RegisterUserUseCase)
+      const loginUser = c.resolve<LoginUserUseCase>(IDENTITY_TOKENS.LoginUserUseCase)
+      return new AuthController(registerUser, loginUser)
     }
   })
 
@@ -152,6 +196,13 @@ export function registerIdentityModule(container: DependencyContainer): void {
       )
 
       return new PermissionsRoutes(controller, authentication, authorization)
+    }
+  })
+
+  container.register<AuthRoutes>(IDENTITY_TOKENS.AuthRoutes, {
+    useFactory: (c) => {
+      const controller = c.resolve<AuthController>(IDENTITY_TOKENS.AuthController)
+      return new AuthRoutes(controller)
     }
   })
 }
