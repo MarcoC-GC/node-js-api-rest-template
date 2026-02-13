@@ -40,15 +40,24 @@ export const IDENTITY_TOKENS = {
   GetPermissionByIdUseCase: Symbol.for('Identity.GetPermissionByIdUseCase'),
   ListPermissionsUseCase: Symbol.for('Identity.ListPermissionsUseCase'),
 
+  // ── Use Cases — Roles ───────────────────────────────────────────────
+  ListRolesUseCase: Symbol.for('Identity.ListRolesUseCase'),
+  GetRoleByIdUseCase: Symbol.for('Identity.GetRoleByIdUseCase'),
+  CreateRoleUseCase: Symbol.for('Identity.CreateRoleUseCase'),
+  UpdateRoleUseCase: Symbol.for('Identity.UpdateRoleUseCase'),
+  DeleteRoleUseCase: Symbol.for('Identity.DeleteRoleUseCase'),
+
   // ── Controllers ─────────────────────────────────────────────────────
   PermissionsController: Symbol.for('Identity.PermissionsController'),
   UsersController: Symbol.for('Identity.UsersController'),
   AuthController: Symbol.for('Identity.AuthController'),
+  RolesController: Symbol.for('Identity.RolesController'),
 
   // ── Routes ──────────────────────────────────────────────────────────
   PermissionsRoutes: Symbol.for('Identity.PermissionsRoutes'),
   UsersRoutes: Symbol.for('Identity.UsersRoutes'),
   AuthRoutes: Symbol.for('Identity.AuthRoutes'),
+  RolesRoutes: Symbol.for('Identity.RolesRoutes'),
 
   // ── Middlewares ─────────────────────────────────────────────────────
   AuthenticationMiddleware: Symbol.for('Identity.AuthenticationMiddleware'),

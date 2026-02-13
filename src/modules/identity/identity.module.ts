@@ -19,6 +19,11 @@ import { GetUserByIdUseCase } from './application/users/use-cases/get-user-by-id
 import { CreateUserUseCase } from './application/users/use-cases/create-user.use-case'
 import { UpdateUserUseCase } from './application/users/use-cases/update-user.use-case'
 import { DeleteUserUseCase } from './application/users/use-cases/delete-user.use-case'
+import { ListRolesUseCase } from './application/roles/use-cases/list-roles.use-case'
+import { GetRoleByIdUseCase } from './application/roles/use-cases/get-role-by-id.use-case'
+import { CreateRoleUseCase } from './application/roles/use-cases/create-role.use-case'
+import { UpdateRoleUseCase } from './application/roles/use-cases/update-role.use-case'
+import { DeleteRoleUseCase } from './application/roles/use-cases/delete-role.use-case'
 import { RegisterUserUseCase } from './application/auth/use-cases/register-user.use-case'
 import { LoginUserUseCase } from './application/auth/use-cases/login-user.use-case'
 
@@ -39,9 +44,11 @@ import { BcryptPasswordHashService } from './infrastructure/services/bcrypt-pass
 import { PermissionsController } from './infrastructure/http/controllers/permissions.controller'
 import { AuthController } from './infrastructure/http/controllers/auth.controller'
 import { UsersController } from './infrastructure/http/controllers/users.controller'
+import { RolesController } from './infrastructure/http/controllers/roles.controller'
 import { PermissionsRoutes } from './infrastructure/http/routes/permissions.routes'
 import { AuthRoutes } from './infrastructure/http/routes/auth.routes'
 import { UsersRoutes } from './infrastructure/http/routes/users.routes'
+import { RolesRoutes } from './infrastructure/http/routes/roles.routes'
 import { AuthenticationMiddleware } from './infrastructure/http/middleware/authentication.middleware'
 import { AuthorizationMiddleware } from './infrastructure/http/middleware/authorization.middleware'
 
@@ -159,6 +166,47 @@ export function registerIdentityModule(container: DependencyContainer): void {
     }
   })
 
+  container.register<ListRolesUseCase>(IDENTITY_TOKENS.ListRolesUseCase, {
+    useFactory: (c) => {
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      return new ListRolesUseCase(roleRepository)
+    }
+  })
+
+  container.register<GetRoleByIdUseCase>(IDENTITY_TOKENS.GetRoleByIdUseCase, {
+    useFactory: (c) => {
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      return new GetRoleByIdUseCase(roleRepository)
+    }
+  })
+
+  container.register<CreateRoleUseCase>(IDENTITY_TOKENS.CreateRoleUseCase, {
+    useFactory: (c) => {
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      const permissionRepository = c.resolve<IPermissionRepository>(
+        IDENTITY_TOKENS.PermissionRepository
+      )
+      return new CreateRoleUseCase(roleRepository, permissionRepository)
+    }
+  })
+
+  container.register<UpdateRoleUseCase>(IDENTITY_TOKENS.UpdateRoleUseCase, {
+    useFactory: (c) => {
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      const permissionRepository = c.resolve<IPermissionRepository>(
+        IDENTITY_TOKENS.PermissionRepository
+      )
+      return new UpdateRoleUseCase(roleRepository, permissionRepository)
+    }
+  })
+
+  container.register<DeleteRoleUseCase>(IDENTITY_TOKENS.DeleteRoleUseCase, {
+    useFactory: (c) => {
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      return new DeleteRoleUseCase(roleRepository)
+    }
+  })
+
   // ── Use Cases — Auth ────────────────────────────────────────────────
   container.register<RegisterUserUseCase>(IDENTITY_TOKENS.RegisterUserUseCase, {
     useFactory: (c) => {
@@ -226,6 +274,18 @@ export function registerIdentityModule(container: DependencyContainer): void {
     }
   })
 
+  container.register<RolesController>(IDENTITY_TOKENS.RolesController, {
+    useFactory: (c) => {
+      const listRoles = c.resolve<ListRolesUseCase>(IDENTITY_TOKENS.ListRolesUseCase)
+      const getRoleById = c.resolve<GetRoleByIdUseCase>(IDENTITY_TOKENS.GetRoleByIdUseCase)
+      const createRole = c.resolve<CreateRoleUseCase>(IDENTITY_TOKENS.CreateRoleUseCase)
+      const updateRole = c.resolve<UpdateRoleUseCase>(IDENTITY_TOKENS.UpdateRoleUseCase)
+      const deleteRole = c.resolve<DeleteRoleUseCase>(IDENTITY_TOKENS.DeleteRoleUseCase)
+
+      return new RolesController(listRoles, getRoleById, createRole, updateRole, deleteRole)
+    }
+  })
+
   // ── Middlewares ──────────────────────────────────────────────────────
   container.register<AuthenticationMiddleware>(IDENTITY_TOKENS.AuthenticationMiddleware, {
     useFactory: (c) => {
@@ -279,6 +339,20 @@ export function registerIdentityModule(container: DependencyContainer): void {
       )
 
       return new UsersRoutes(controller, authentication, authorization)
+    }
+  })
+
+  container.register<RolesRoutes>(IDENTITY_TOKENS.RolesRoutes, {
+    useFactory: (c) => {
+      const controller = c.resolve<RolesController>(IDENTITY_TOKENS.RolesController)
+      const authentication = c.resolve<AuthenticationMiddleware>(
+        IDENTITY_TOKENS.AuthenticationMiddleware
+      )
+      const authorization = c.resolve<AuthorizationMiddleware>(
+        IDENTITY_TOKENS.AuthorizationMiddleware
+      )
+
+      return new RolesRoutes(controller, authentication, authorization)
     }
   })
 }

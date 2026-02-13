@@ -12,6 +12,7 @@ import { ErrorHandlerMiddleware } from '@/modules/common/middleware/error-handle
 import { PermissionsRoutes } from '@/modules/identity/infrastructure/http/routes/permissions.routes'
 import { AuthRoutes } from '@/modules/identity/infrastructure/http/routes/auth.routes'
 import { UsersRoutes } from '@/modules/identity/infrastructure/http/routes/users.routes'
+import { RolesRoutes } from '@/modules/identity/infrastructure/http/routes/roles.routes'
 import { IDENTITY_TOKENS } from '@/modules/identity/identity.tokens'
 
 /**
@@ -50,6 +51,7 @@ export class App {
   private readonly permissionsRoutes: PermissionsRoutes
   private readonly authRoutes: AuthRoutes
   private readonly usersRoutes: UsersRoutes
+  private readonly rolesRoutes: RolesRoutes
 
   constructor() {
     // Resolve core dependencies
@@ -69,6 +71,7 @@ export class App {
     this.permissionsRoutes = container.resolve<PermissionsRoutes>(IDENTITY_TOKENS.PermissionsRoutes)
     this.authRoutes = container.resolve<AuthRoutes>(IDENTITY_TOKENS.AuthRoutes)
     this.usersRoutes = container.resolve<UsersRoutes>(IDENTITY_TOKENS.UsersRoutes)
+    this.rolesRoutes = container.resolve<RolesRoutes>(IDENTITY_TOKENS.RolesRoutes)
 
     // Create Express app
     this.app = express()
@@ -183,6 +186,7 @@ export class App {
     this.app.use('/api/auth', this.authRoutes.getRouter())
     this.app.use('/api/permissions', this.permissionsRoutes.getRouter())
     this.app.use('/api/users', this.usersRoutes.getRouter())
+    this.app.use('/api/roles', this.rolesRoutes.getRouter())
 
     this.logger.info('Routes configured')
   }

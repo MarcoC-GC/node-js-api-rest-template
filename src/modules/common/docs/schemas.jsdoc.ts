@@ -298,6 +298,108 @@
  *             $ref: '#/components/schemas/UserResponse'
  *         pagination:
  *           $ref: '#/components/schemas/PaginationMetadata'
+ *
+ *     RoleResponse:
+ *       type: object
+ *       description: Role entity representation
+ *       required:
+ *         - id
+ *         - name
+ *         - description
+ *         - isSystem
+ *         - permissionIds
+ *         - createdAt
+ *         - updatedAt
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique role identifier
+ *           example: 4cc11769-29ef-46a1-9b7d-12d98b6c6ef5
+ *         name:
+ *           type: string
+ *           description: Role name (uppercase)
+ *           example: ADMIN
+ *         description:
+ *           type: string
+ *           description: Role description
+ *           example: System administrators
+ *         isSystem:
+ *           type: boolean
+ *           description: Whether the role is a system role
+ *           example: true
+ *         permissionIds:
+ *           type: array
+ *           description: Permission identifiers assigned to the role
+ *           items:
+ *             type: string
+ *             format: uuid
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the role was created
+ *           example: 2026-02-07T13:26:24.206Z
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the role was last updated
+ *           example: 2026-02-07T13:26:24.206Z
+ *
+ *     CreateRoleRequest:
+ *       type: object
+ *       description: Payload to create a new role (system roles are not allowed)
+ *       required:
+ *         - name
+ *         - description
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Role name (uppercase, numbers, underscores)
+ *           example: SUPPORT_AGENT
+ *         description:
+ *           type: string
+ *           description: Role description
+ *           example: Support team role
+ *         permissionIds:
+ *           type: array
+ *           description: Optional list of permission IDs to assign
+ *           items:
+ *             type: string
+ *             format: uuid
+ *
+ *     UpdateRoleRequest:
+ *       type: object
+ *       description: Payload to update a role (system roles cannot be edited)
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Role name (uppercase, numbers, underscores)
+ *           example: SUPPORT_LEAD
+ *         description:
+ *           type: string
+ *           description: Role description
+ *           example: Support team lead role
+ *         permissionIds:
+ *           type: array
+ *           description: Optional list of permission IDs to replace
+ *           items:
+ *             type: string
+ *             format: uuid
+ *
+ *     PaginatedRoleResponse:
+ *       type: object
+ *       description: Paginated list of roles
+ *       required:
+ *         - data
+ *         - pagination
+ *       properties:
+ *         data:
+ *           type: array
+ *           description: Array of role objects for the current page
+ *           items:
+ *             $ref: '#/components/schemas/RoleResponse'
+ *         pagination:
+ *           $ref: '#/components/schemas/PaginationMetadata'
  */
 
 // This file only contains JSDoc comments, no executable code
