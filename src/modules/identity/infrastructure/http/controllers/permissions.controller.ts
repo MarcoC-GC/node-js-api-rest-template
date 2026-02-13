@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import { GetPermissionByIdUseCase } from '@/modules/identity/application/permissions/use-cases/get-permission-by-id.use-case'
 import { ListPermissionsUseCase } from '@/modules/identity/application/permissions/use-cases/list-permissions.use-case'
-import { ValidationError } from '@/modules/common/errors/validation.error'
+import { ZodValidationError } from '@/modules/common/errors/infrastructure/zod-validation.error'
 
 const permissionIdParamsSchema = z.object({
   id: z.uuid()
@@ -67,12 +67,7 @@ export class PermissionsController {
       const paramsResult = permissionIdParamsSchema.safeParse(req.params)
 
       if (!paramsResult.success) {
-        const issue = paramsResult.error.issues[0]
-        return next(
-          new ValidationError('id', issue?.message || 'Invalid ID parameter', {
-            metadata: { issues: paramsResult.error.issues }
-          })
-        )
+        return next(ZodValidationError.fromZodError(paramsResult.error))
       }
 
       const result = await this.getPermissionByIdUseCase.execute(paramsResult.data.id)
@@ -154,12 +149,7 @@ export class PermissionsController {
       const queryResult = paginationQuerySchema.safeParse(req.query)
 
       if (!queryResult.success) {
-        const issue = queryResult.error.issues[0]
-        return next(
-          new ValidationError(issue?.path.join('.') || 'query', issue?.message || 'Invalid query', {
-            metadata: { issues: queryResult.error.issues }
-          })
-        )
+        return next(ZodValidationError.fromZodError(queryResult.error))
       }
 
       const { limit, offset } = queryResult.data

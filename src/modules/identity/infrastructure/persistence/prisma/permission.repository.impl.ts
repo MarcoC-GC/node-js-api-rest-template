@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/generated/prisma/client'
+import { Prisma, PrismaClient } from '@/generated/prisma/client'
 import { Result } from '@/lib/result/result'
 import { DatabaseError } from '@/modules/common/errors/database.error'
 import { IPermissionRepository } from '@/modules/identity/domain/repositories/permission.repository.interface'
@@ -245,9 +245,9 @@ export class PermissionRepositoryImpl implements IPermissionRepository {
         where: { id: id.getValue() }
       })
       return Result.ok(true)
-    } catch (error: any) {
+    } catch (error) {
       // Prisma error code for record not found
-      if (error.code === 'P2025') {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return Result.ok(false)
       }
       return Result.fail(
