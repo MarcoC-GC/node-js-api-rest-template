@@ -90,6 +90,12 @@ export class Config {
     return this.env.JWT_EXPIRES_IN
   }
 
+  // Bcrypt Configuration
+
+  get bcryptSaltRounds(): number {
+    return this.env.BCRYPT_SALT_ROUNDS
+  }
+
   // CORS Configuration
 
   get corsOptions(): CorsOptions {
