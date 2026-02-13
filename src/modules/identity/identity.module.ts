@@ -14,6 +14,11 @@ import { GetPermissionByIdUseCase } from './application/permissions/use-cases/ge
 import { ListPermissionsUseCase } from './application/permissions/use-cases/list-permissions.use-case'
 import { CheckPermissionUseCase } from './application/authorization/use-cases/check-permission.use-case'
 import { GetActiveUserByIdUseCase } from './application/users/use-cases/get-active-user-by-id.use-case'
+import { ListUsersUseCase } from './application/users/use-cases/list-users.use-case'
+import { GetUserByIdUseCase } from './application/users/use-cases/get-user-by-id.use-case'
+import { CreateUserUseCase } from './application/users/use-cases/create-user.use-case'
+import { UpdateUserUseCase } from './application/users/use-cases/update-user.use-case'
+import { DeleteUserUseCase } from './application/users/use-cases/delete-user.use-case'
 import { RegisterUserUseCase } from './application/auth/use-cases/register-user.use-case'
 import { LoginUserUseCase } from './application/auth/use-cases/login-user.use-case'
 
@@ -33,8 +38,10 @@ import { BcryptPasswordHashService } from './infrastructure/services/bcrypt-pass
 // Infrastructure — HTTP
 import { PermissionsController } from './infrastructure/http/controllers/permissions.controller'
 import { AuthController } from './infrastructure/http/controllers/auth.controller'
+import { UsersController } from './infrastructure/http/controllers/users.controller'
 import { PermissionsRoutes } from './infrastructure/http/routes/permissions.routes'
 import { AuthRoutes } from './infrastructure/http/routes/auth.routes'
+import { UsersRoutes } from './infrastructure/http/routes/users.routes'
 import { AuthenticationMiddleware } from './infrastructure/http/middleware/authentication.middleware'
 import { AuthorizationMiddleware } from './infrastructure/http/middleware/authorization.middleware'
 
@@ -109,6 +116,49 @@ export function registerIdentityModule(container: DependencyContainer): void {
     }
   })
 
+  container.register<ListUsersUseCase>(IDENTITY_TOKENS.ListUsersUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      return new ListUsersUseCase(userRepository)
+    }
+  })
+
+  container.register<GetUserByIdUseCase>(IDENTITY_TOKENS.GetUserByIdUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      return new GetUserByIdUseCase(userRepository)
+    }
+  })
+
+  container.register<CreateUserUseCase>(IDENTITY_TOKENS.CreateUserUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      const passwordHashService = c.resolve<IPasswordHashService>(
+        IDENTITY_TOKENS.PasswordHashService
+      )
+      return new CreateUserUseCase(userRepository, roleRepository, passwordHashService)
+    }
+  })
+
+  container.register<UpdateUserUseCase>(IDENTITY_TOKENS.UpdateUserUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      const roleRepository = c.resolve<IRoleRepository>(IDENTITY_TOKENS.RoleRepository)
+      const passwordHashService = c.resolve<IPasswordHashService>(
+        IDENTITY_TOKENS.PasswordHashService
+      )
+      return new UpdateUserUseCase(userRepository, roleRepository, passwordHashService)
+    }
+  })
+
+  container.register<DeleteUserUseCase>(IDENTITY_TOKENS.DeleteUserUseCase, {
+    useFactory: (c) => {
+      const userRepository = c.resolve<IUserRepository>(IDENTITY_TOKENS.UserRepository)
+      return new DeleteUserUseCase(userRepository)
+    }
+  })
+
   // ── Use Cases — Auth ────────────────────────────────────────────────
   container.register<RegisterUserUseCase>(IDENTITY_TOKENS.RegisterUserUseCase, {
     useFactory: (c) => {
@@ -164,6 +214,18 @@ export function registerIdentityModule(container: DependencyContainer): void {
     }
   })
 
+  container.register<UsersController>(IDENTITY_TOKENS.UsersController, {
+    useFactory: (c) => {
+      const listUsers = c.resolve<ListUsersUseCase>(IDENTITY_TOKENS.ListUsersUseCase)
+      const getUserById = c.resolve<GetUserByIdUseCase>(IDENTITY_TOKENS.GetUserByIdUseCase)
+      const createUser = c.resolve<CreateUserUseCase>(IDENTITY_TOKENS.CreateUserUseCase)
+      const updateUser = c.resolve<UpdateUserUseCase>(IDENTITY_TOKENS.UpdateUserUseCase)
+      const deleteUser = c.resolve<DeleteUserUseCase>(IDENTITY_TOKENS.DeleteUserUseCase)
+
+      return new UsersController(listUsers, getUserById, createUser, updateUser, deleteUser)
+    }
+  })
+
   // ── Middlewares ──────────────────────────────────────────────────────
   container.register<AuthenticationMiddleware>(IDENTITY_TOKENS.AuthenticationMiddleware, {
     useFactory: (c) => {
@@ -203,6 +265,20 @@ export function registerIdentityModule(container: DependencyContainer): void {
     useFactory: (c) => {
       const controller = c.resolve<AuthController>(IDENTITY_TOKENS.AuthController)
       return new AuthRoutes(controller)
+    }
+  })
+
+  container.register<UsersRoutes>(IDENTITY_TOKENS.UsersRoutes, {
+    useFactory: (c) => {
+      const controller = c.resolve<UsersController>(IDENTITY_TOKENS.UsersController)
+      const authentication = c.resolve<AuthenticationMiddleware>(
+        IDENTITY_TOKENS.AuthenticationMiddleware
+      )
+      const authorization = c.resolve<AuthorizationMiddleware>(
+        IDENTITY_TOKENS.AuthorizationMiddleware
+      )
+
+      return new UsersRoutes(controller, authentication, authorization)
     }
   })
 }

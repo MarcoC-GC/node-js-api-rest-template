@@ -30,6 +30,11 @@ export const IDENTITY_TOKENS = {
 
   // ── Use Cases — Users ───────────────────────────────────────────────
   GetActiveUserByIdUseCase: Symbol.for('Identity.GetActiveUserByIdUseCase'),
+  ListUsersUseCase: Symbol.for('Identity.ListUsersUseCase'),
+  GetUserByIdUseCase: Symbol.for('Identity.GetUserByIdUseCase'),
+  CreateUserUseCase: Symbol.for('Identity.CreateUserUseCase'),
+  UpdateUserUseCase: Symbol.for('Identity.UpdateUserUseCase'),
+  DeleteUserUseCase: Symbol.for('Identity.DeleteUserUseCase'),
 
   // ── Use Cases — Permissions ─────────────────────────────────────────
   GetPermissionByIdUseCase: Symbol.for('Identity.GetPermissionByIdUseCase'),
@@ -37,10 +42,12 @@ export const IDENTITY_TOKENS = {
 
   // ── Controllers ─────────────────────────────────────────────────────
   PermissionsController: Symbol.for('Identity.PermissionsController'),
+  UsersController: Symbol.for('Identity.UsersController'),
   AuthController: Symbol.for('Identity.AuthController'),
 
   // ── Routes ──────────────────────────────────────────────────────────
   PermissionsRoutes: Symbol.for('Identity.PermissionsRoutes'),
+  UsersRoutes: Symbol.for('Identity.UsersRoutes'),
   AuthRoutes: Symbol.for('Identity.AuthRoutes'),
 
   // ── Middlewares ─────────────────────────────────────────────────────

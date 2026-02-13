@@ -153,6 +153,151 @@
  *             $ref: '#/components/schemas/PermissionResponse'
  *         pagination:
  *           $ref: '#/components/schemas/PaginationMetadata'
+ *
+ *     UserResponse:
+ *       type: object
+ *       description: User entity representation
+ *       required:
+ *         - id
+ *         - email
+ *         - firstName
+ *         - lastName
+ *         - fullName
+ *         - isActive
+ *         - roleId
+ *         - createdAt
+ *         - updatedAt
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique user identifier
+ *           example: 550e8400-e29b-41d4-a716-446655440000
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: User email address
+ *           example: user@example.com
+ *         firstName:
+ *           type: string
+ *           description: User first name
+ *           example: John
+ *         lastName:
+ *           type: string
+ *           description: User last name
+ *           example: Doe
+ *         fullName:
+ *           type: string
+ *           description: User full name
+ *           example: John Doe
+ *         isActive:
+ *           type: boolean
+ *           description: Whether the user is active
+ *           example: true
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           description: Role identifier assigned to the user
+ *           example: 660e8400-e29b-41d4-a716-446655440001
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the user was created
+ *           example: 2026-02-07T13:26:24.206Z
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the user was last updated
+ *           example: 2026-02-07T13:26:24.206Z
+ *
+ *     CreateUserRequest:
+ *       type: object
+ *       description: Payload to create a new user
+ *       required:
+ *         - email
+ *         - password
+ *         - firstName
+ *         - lastName
+ *         - roleId
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: User email address
+ *           example: user@example.com
+ *         password:
+ *           type: string
+ *           format: password
+ *           minLength: 8
+ *           maxLength: 72
+ *           description: User password following security policy
+ *           example: SecureP@ss123!
+ *         firstName:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 100
+ *           example: John
+ *         lastName:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 100
+ *           example: Doe
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           description: Role identifier assigned to the user
+ *           example: 660e8400-e29b-41d4-a716-446655440001
+ *
+ *     UpdateUserRequest:
+ *       type: object
+ *       description: Payload to update a user
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: User email address
+ *           example: user@example.com
+ *         password:
+ *           type: string
+ *           format: password
+ *           minLength: 8
+ *           maxLength: 72
+ *           description: User password following security policy
+ *           example: SecureP@ss123!
+ *         firstName:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 100
+ *           example: John
+ *         lastName:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 100
+ *           example: Doe
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           description: Role identifier assigned to the user
+ *           example: 660e8400-e29b-41d4-a716-446655440001
+ *         isActive:
+ *           type: boolean
+ *           description: Whether the user is active
+ *           example: true
+ *
+ *     PaginatedUserResponse:
+ *       type: object
+ *       description: Paginated list of users
+ *       required:
+ *         - data
+ *         - pagination
+ *       properties:
+ *         data:
+ *           type: array
+ *           description: Array of user objects for the current page
+ *           items:
+ *             $ref: '#/components/schemas/UserResponse'
+ *         pagination:
+ *           $ref: '#/components/schemas/PaginationMetadata'
  */
 
 // This file only contains JSDoc comments, no executable code
