@@ -22,6 +22,7 @@ describe('CreateUserUseCase', () => {
       id: RoleId.create(),
       name: 'USER',
       description: 'Default role',
+      isSystem: false,
       permissionIds: [PermissionId.create()],
       createdAt: new Date('2024-01-01T00:00:00.000Z'),
       updatedAt: new Date('2024-01-01T00:00:00.000Z')

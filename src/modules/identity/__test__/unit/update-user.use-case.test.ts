@@ -43,6 +43,7 @@ describe('UpdateUserUseCase', () => {
       id: RoleId.create(),
       name: 'ADMIN',
       description: 'Admin role',
+      isSystem: false,
       permissionIds: [PermissionId.create()],
       createdAt: new Date('2024-01-01T00:00:00.000Z'),
       updatedAt: new Date('2024-01-01T00:00:00.000Z')
