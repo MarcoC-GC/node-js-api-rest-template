@@ -158,7 +158,7 @@ export class LoginUserUseCase {
         new UnauthorizedError('Invalid credentials', {
           aggregateType: 'User',
           operation: 'login',
-          metadata: { reason: 'user_not_found', email: input.email }
+          metadata: { reason: 'user_not_found' }
         })
       )
     }
@@ -172,7 +172,7 @@ export class LoginUserUseCase {
           aggregateType: 'User',
           aggregateId: user.id.getValue(),
           operation: 'login',
-          metadata: { reason: 'account_inactive', email: input.email }
+          metadata: { reason: 'account_inactive' }
         })
       )
     }
@@ -190,7 +190,7 @@ export class LoginUserUseCase {
           aggregateType: 'User',
           aggregateId: user.id.getValue(),
           operation: 'login',
-          metadata: { reason: 'invalid_password', email: input.email }
+          metadata: { reason: 'invalid_password' }
         })
       )
     }

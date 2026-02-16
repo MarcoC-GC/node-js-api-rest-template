@@ -62,6 +62,7 @@ export async function initContainer(config: Config): Promise<DependencyContainer
   const adapter = new PrismaPg(pool)
   const prismaClient = new PrismaClient({ adapter })
 
+  container.register<Pool>(TOKENS.PgPool, { useValue: pool })
   container.register<PrismaClient>(TOKENS.PrismaClient, { useValue: prismaClient })
 
   // ── Middlewares ─────────────────────────────────────────────────────
@@ -121,9 +122,11 @@ function registerMiddlewares(c: DependencyContainer): void {
  * Disconnects database pool and Prisma client.
  */
 export async function disposeContainer(): Promise<void> {
+  const pool = container.resolve<Pool>(TOKENS.PgPool)
   const prisma = container.resolve<PrismaClient>(TOKENS.PrismaClient)
 
   await prisma.$disconnect()
+  await pool.end()
 }
 
 /**

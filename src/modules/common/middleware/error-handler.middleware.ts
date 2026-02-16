@@ -56,13 +56,13 @@ export class ErrorHandlerMiddleware implements IErrorMiddleware {
           error: error.message,
           errorCode: error.errorCode,
           httpStatus: error.httpStatus,
-          context: error.context
+          context: this.isDevelopment ? error.context : undefined
         })
       } else {
         this.logger.error('Non-operational error', error, {
           requestId: req.id,
           errorCode: error.errorCode,
-          context: error.context
+          context: this.isDevelopment ? error.context : undefined
         })
       }
     } else {

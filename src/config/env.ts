@@ -20,6 +20,10 @@ const envSchema = z.object({
 
   // API
   API_BASE_URL: z.string().url('API_BASE_URL must be a valid URL'),
+  ENABLE_API_DOCS: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
 
   // Logging
   LOG_LEVEL: z

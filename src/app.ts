@@ -1,4 +1,4 @@
-import express, { Express } from 'express'
+import express, { Express, Request } from 'express'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
 import { container } from 'tsyringe'
@@ -118,7 +118,7 @@ export class App {
         limit: this.config.rateLimitGlobalMax,
         standardHeaders: true,
         legacyHeaders: false,
-        skip: (req) => req.path === '/health' || req.path.startsWith('/api/docs')
+        skip: (req: Request) => req.path === '/health' || req.path.startsWith('/api/docs')
       })
     )
 
@@ -201,19 +201,23 @@ export class App {
       })
     })
 
-    // OpenAPI JSON specification endpoint
-    this.app.get('/api/docs/openapi.json', (req, res) => {
-      res.setHeader('Content-Type', 'application/json')
-      res.json(swaggerSpec)
-    })
-
-    // Scalar API documentation UI
-    this.app.use(
-      '/api/docs',
-      apiReference({
-        url: '/api/docs/openapi.json'
+    if (this.config.apiDocsEnabled) {
+      // OpenAPI JSON specification endpoint
+      this.app.get('/api/docs/openapi.json', (req, res) => {
+        res.setHeader('Content-Type', 'application/json')
+        res.json(swaggerSpec)
       })
-    )
+
+      // Scalar API documentation UI
+      this.app.use(
+        '/api/docs',
+        apiReference({
+          url: '/api/docs/openapi.json'
+        })
+      )
+    } else {
+      this.logger.info('API docs disabled')
+    }
 
     // Register module routes
     this.app.use('/api/auth', this.authRoutes.getRouter())

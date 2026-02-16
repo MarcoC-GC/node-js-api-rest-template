@@ -24,6 +24,7 @@ export const TOKENS = {
   Config: Symbol.for('Config'),
   ILogger: Symbol.for('ILogger'),
   PrismaClient: Symbol.for('PrismaClient'),
+  PgPool: Symbol.for('PgPool'),
 
   // ── Middleware ───────────────────────────────────────────────────────
   CorsMiddleware: Symbol.for('CorsMiddleware'),
