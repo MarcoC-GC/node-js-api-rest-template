@@ -1,195 +1,135 @@
-# Node.js API REST Template
+# Node.js REST API Template
 
-Template profesional para APIs REST con Node.js, TypeScript, Express y las mejores prácticas de desarrollo.
+Boilerplate para arrancar APIs REST en Node.js con TypeScript, arquitectura por capas y enfoque production-ready.
 
-## Características
+## Stack
 
-- **TypeScript** - Tipado estático para mayor seguridad y mantenibilidad
-- **Express** - Framework web rápido y minimalista
-- **Prisma** - ORM moderno para bases de datos
-- **ESLint + Prettier** - Linting y formateo automático de código (estilo Standard)
-- **Vitest** - Framework de testing rápido con soporte TypeScript
-- **Husky + lint-staged** - Git hooks para validar código antes de commits
-- **pnpm** - Gestor de paquetes rápido y eficiente
+- TypeScript + Express 5
+- Prisma 7 + PostgreSQL
+- Zod para validacion de input
+- Vitest para testing
+- ESLint + Prettier
+- Husky + lint-staged
+- OpenAPI/Swagger + Scalar docs
 
-## Requisitos Previos
+## Requisitos
 
-- Node.js >= 18
+- Node.js >= 22
 - pnpm >= 10
 
-## Instalación
+## Quick Start
 
 ```bash
-# Instalar dependencias
 pnpm install
-
-# Copiar archivo de variables de entorno
 cp .env.example .env
-
-# Configurar las variables de entorno en .env
-```
-
-## Scripts Disponibles
-
-### Desarrollo
-
-```bash
-# Iniciar servidor en modo desarrollo con hot-reload
+pnpm prisma:generate
+pnpm prisma:migrate
+pnpm prisma:seed
 pnpm dev
 ```
 
-### Build y Producción
+## Post-clone Checklist
+
+1. Cambiar secretos en `.env` (`JWT_SECRET`, credenciales DB, admin seed).
+2. Ajustar CORS para tu frontend real (`CORS_ORIGIN`, `CORS_CREDENTIALS`).
+3. Configurar `TRUST_PROXY=true` si deployas detras de reverse proxy.
+4. Revisar rate limits (`RATE_LIMIT_*`) segun trafico esperado.
+5. Ejecutar `pnpm check` antes del primer commit.
+
+## Scripts
 
 ```bash
-# Compilar TypeScript a JavaScript
+# Development
+pnpm dev
+
+# Build / Run
 pnpm build
-
-# Iniciar servidor en producción
 pnpm start
-```
 
-### Testing
-
-```bash
-# Ejecutar tests en modo watch
-pnpm test
-
-# Ejecutar tests con interfaz UI
-pnpm test:ui
-
-# Generar reporte de cobertura
-pnpm test:coverage
-```
-
-### Linting y Formateo
-
-```bash
-# Verificar errores de linting
+# Quality
 pnpm lint
+pnpm typecheck
+pnpm test
+pnpm test:run
+pnpm test:coverage
+pnpm check
 
-# Corregir errores de linting automáticamente
-pnpm lint:fix
-
-# Formatear código con Prettier
-pnpm format
-
-# Verificar formateo sin modificar archivos
-pnpm format:check
-```
-
-## Estructura del Proyecto
-
-```
-.
-├── src/                    # Código fuente
-│   └── index.ts           # Punto de entrada de la aplicación
-├── tests/                 # Tests
-│   └── example.test.ts    # Ejemplo de test
-├── dist/                  # Archivos compilados (generado)
-├── .husky/                # Git hooks
-│   └── pre-commit        # Hook de pre-commit
-├── eslint.config.js      # Configuración de ESLint
-├── .prettierrc           # Configuración de Prettier
-├── .prettierignore       # Archivos ignorados por Prettier
-├── .lintstagedrc.json    # Configuración de lint-staged
-├── .editorconfig         # Configuración del editor
-├── vitest.config.ts      # Configuración de Vitest
-├── tsconfig.json         # Configuración de TypeScript
-└── package.json          # Dependencias y scripts
-```
-
-## Configuración de Linting y Formateo
-
-Este proyecto utiliza:
-
-- **ESLint 9** con configuración estilo Standard
-  - Sin punto y coma (`;`)
-  - Comillas simples (`'`)
-  - Indentación de 2 espacios
-  - Reglas estrictas de TypeScript
-
-- **Prettier** integrado con ESLint
-  - Formateo automático consistente
-  - Configuración sincronizada con Standard
-
-- **Husky + lint-staged**
-  - Pre-commit hook que ejecuta linting y formateo automáticamente
-  - Solo valida archivos modificados para mejor rendimiento
-
-## Testing
-
-Este proyecto usa **Vitest**, un framework de testing moderno y rápido:
-
-- API compatible con Jest
-- Soporte nativo para TypeScript
-- Hot Module Replacement (HMR)
-- Coverage con v8
-- Interfaz UI opcional
-
-### Escribir Tests
-
-```typescript
-import { describe, it, expect } from 'vitest'
-
-describe('Mi Feature', () => {
-  it('debe hacer algo', () => {
-    expect(true).toBe(true)
-  })
-})
+# Prisma
+pnpm prisma:generate
+pnpm prisma:migrate
+pnpm prisma:migrate:deploy
+pnpm prisma:migrate:status
+pnpm prisma:migrate:reset
+pnpm prisma:push
+pnpm prisma:pull
+pnpm prisma:studio
+pnpm prisma:seed
 ```
 
 ## Variables de Entorno
 
-Crear un archivo `.env` en la raíz del proyecto:
+Base:
 
-```env
-PORT=3000
-NODE_ENV=development
+- `NODE_ENV`, `PORT`, `API_BASE_URL`
+- `DATABASE_URL`
+- `JWT_SECRET`, `JWT_EXPIRES_IN`
+- `BCRYPT_SALT_ROUNDS`
+
+Seguridad/Infra:
+
+- `CORS_ORIGIN`
+- `CORS_CREDENTIALS`
+- `TRUST_PROXY`
+- `RATE_LIMIT_GLOBAL_WINDOW_MS`
+- `RATE_LIMIT_GLOBAL_MAX`
+- `RATE_LIMIT_AUTH_WINDOW_MS`
+- `RATE_LIMIT_AUTH_MAX`
+
+Seed:
+
+- `ALLOW_PROD_SEED`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `ADMIN_FIRST_NAME`
+- `ADMIN_LAST_NAME`
+
+> El seed bloquea produccion por default. Solo corre en `production` si `ALLOW_PROD_SEED=true`.
+
+## API Docs
+
+- OpenAPI JSON: `GET /api/docs/openapi.json`
+- UI (Scalar): `GET /api/docs`
+- Healthcheck: `GET /health`
+
+## Estructura
+
+```text
+.
+├── prisma/
+├── src/
+│   ├── config/
+│   ├── lib/
+│   └── modules/
+│       ├── common/
+│       └── identity/
+│           ├── application/
+│           ├── domain/
+│           ├── infrastructure/
+│           └── docs/
+├── .github/workflows/ci.yml
+├── .env.example
+├── eslint.config.js
+├── tsconfig.json
+├── vitest.config.ts
+└── package.json
 ```
 
-## Git Hooks
+## CI
 
-Al hacer commit, automáticamente se ejecutará:
+El workflow de GitHub Actions (`.github/workflows/ci.yml`) corre en push a `main` y en pull requests:
 
-1. **lint-staged** - Ejecuta ESLint y Prettier en archivos modificados
-2. Si hay errores, el commit será rechazado
-3. Los errores de formateo se corrigen automáticamente
-
-Para saltar los hooks (no recomendado):
-
-```bash
-git commit --no-verify
-```
-
-## Configuración del Editor
-
-### VS Code
-
-Instalar extensiones recomendadas:
-
-- ESLint
-- Prettier
-- EditorConfig
-
-Agregar a `.vscode/settings.json`:
-
-```json
-{
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  }
-}
-```
-
-## Contribuir
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+- install (`pnpm install --frozen-lockfile`)
+- `pnpm check` (lint + typecheck + tests)
 
 ## Licencia
 
