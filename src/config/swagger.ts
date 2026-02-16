@@ -74,12 +74,7 @@ const options: Options = {
     }
   },
   // Paths to files containing JSDoc comments
-  apis: [
-    './src/modules/**/controllers/*.ts',
-    './src/modules/**/routes/*.ts',
-    './src/modules/**/docs/*.ts',
-    './src/app.ts'
-  ]
+  apis: ['./src/modules/**/routes/*.ts', './src/modules/**/docs/*.ts', './src/app.ts']
 }
 
 /**

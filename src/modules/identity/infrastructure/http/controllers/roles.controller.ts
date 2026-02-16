@@ -49,11 +49,6 @@ const updateRoleSchema = z
     message: 'At least one field must be provided'
   })
 
-/**
- * Roles Controller
- *
- * Handles HTTP requests for role operations.
- */
 export class RolesController {
   constructor(
     private readonly listRolesUseCase: ListRolesUseCase,
@@ -63,50 +58,6 @@ export class RolesController {
     private readonly deleteRoleUseCase: DeleteRoleUseCase
   ) {}
 
-  /**
-   * @openapi
-   * /api/roles:
-   *   get:
-   *     summary: List all roles
-   *     description: Retrieve a paginated list of roles in the system.
-   *     tags:
-   *       - Roles
-   *     security:
-   *       - bearerAuth: []
-   *     parameters:
-   *       - in: query
-   *         name: limit
-   *         required: false
-   *         schema:
-   *           type: integer
-   *           minimum: 1
-   *           maximum: 100
-   *           default: 20
-   *         description: Maximum number of items to return per page
-   *       - in: query
-   *         name: offset
-   *         required: false
-   *         schema:
-   *           type: integer
-   *           minimum: 0
-   *           default: 0
-   *         description: Number of items to skip from the beginning
-   *     responses:
-   *       200:
-   *         description: Paginated list of roles retrieved successfully
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/PaginatedRoleResponse'
-   *       400:
-   *         $ref: '#/components/responses/BadRequest'
-   *       401:
-   *         $ref: '#/components/responses/Unauthorized'
-   *       403:
-   *         $ref: '#/components/responses/Forbidden'
-   *       500:
-   *         $ref: '#/components/responses/InternalServerError'
-   */
   async list(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const queryResult = paginationQuerySchema.safeParse(req.query)
@@ -129,42 +80,6 @@ export class RolesController {
     }
   }
 
-  /**
-   * @openapi
-   * /api/roles/{id}:
-   *   get:
-   *     summary: Get role by ID
-   *     description: Retrieve a single role by its unique identifier (UUID v4)
-   *     tags:
-   *       - Roles
-   *     security:
-   *       - bearerAuth: []
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: string
-   *           format: uuid
-   *         description: Role unique identifier
-   *     responses:
-   *       200:
-   *         description: Role found successfully
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/RoleResponse'
-   *       400:
-   *         $ref: '#/components/responses/BadRequest'
-   *       401:
-   *         $ref: '#/components/responses/Unauthorized'
-   *       403:
-   *         $ref: '#/components/responses/Forbidden'
-   *       404:
-   *         $ref: '#/components/responses/NotFound'
-   *       500:
-   *         $ref: '#/components/responses/InternalServerError'
-   */
   async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const paramsResult = roleIdParamsSchema.safeParse(req.params)
@@ -186,40 +101,6 @@ export class RolesController {
     }
   }
 
-  /**
-   * @openapi
-   * /api/roles:
-   *   post:
-   *     summary: Create a new role
-   *     description: Create a custom role. System roles cannot be created via this endpoint.
-   *     tags:
-   *       - Roles
-   *     security:
-   *       - bearerAuth: []
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/CreateRoleRequest'
-   *     responses:
-   *       201:
-   *         description: Role created successfully
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/RoleResponse'
-   *       400:
-   *         $ref: '#/components/responses/BadRequest'
-   *       401:
-   *         $ref: '#/components/responses/Unauthorized'
-   *       403:
-   *         $ref: '#/components/responses/Forbidden'
-   *       409:
-   *         $ref: '#/components/responses/Conflict'
-   *       500:
-   *         $ref: '#/components/responses/InternalServerError'
-   */
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const bodyResult = createRoleSchema.safeParse(req.body)
@@ -241,50 +122,6 @@ export class RolesController {
     }
   }
 
-  /**
-   * @openapi
-   * /api/roles/{id}:
-   *   patch:
-   *     summary: Update a role
-   *     description: Update a role (system roles cannot be edited).
-   *     tags:
-   *       - Roles
-   *     security:
-   *       - bearerAuth: []
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: string
-   *           format: uuid
-   *         description: Role unique identifier
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/UpdateRoleRequest'
-   *     responses:
-   *       200:
-   *         description: Role updated successfully
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/RoleResponse'
-   *       400:
-   *         $ref: '#/components/responses/BadRequest'
-   *       401:
-   *         $ref: '#/components/responses/Unauthorized'
-   *       403:
-   *         $ref: '#/components/responses/Forbidden'
-   *       404:
-   *         $ref: '#/components/responses/NotFound'
-   *       409:
-   *         $ref: '#/components/responses/Conflict'
-   *       500:
-   *         $ref: '#/components/responses/InternalServerError'
-   */
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const paramsResult = roleIdParamsSchema.safeParse(req.params)
@@ -312,38 +149,6 @@ export class RolesController {
     }
   }
 
-  /**
-   * @openapi
-   * /api/roles/{id}:
-   *   delete:
-   *     summary: Delete a role
-   *     description: Delete a role (system roles cannot be deleted).
-   *     tags:
-   *       - Roles
-   *     security:
-   *       - bearerAuth: []
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: string
-   *           format: uuid
-   *         description: Role unique identifier
-   *     responses:
-   *       204:
-   *         description: Role deleted successfully
-   *       400:
-   *         $ref: '#/components/responses/BadRequest'
-   *       401:
-   *         $ref: '#/components/responses/Unauthorized'
-   *       403:
-   *         $ref: '#/components/responses/Forbidden'
-   *       404:
-   *         $ref: '#/components/responses/NotFound'
-   *       500:
-   *         $ref: '#/components/responses/InternalServerError'
-   */
   async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const paramsResult = roleIdParamsSchema.safeParse(req.params)
