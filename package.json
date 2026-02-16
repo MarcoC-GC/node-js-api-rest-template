@@ -2,7 +2,8 @@
   "name": "node-js-api-rest-template",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/index.mjs",
+  "exports": "./dist/index.mjs",
   "type": "module",
   "scripts": {
     "build": "tsdown",

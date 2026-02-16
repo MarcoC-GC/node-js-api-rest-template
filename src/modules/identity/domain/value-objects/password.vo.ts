@@ -96,6 +96,10 @@ export class Password {
    * Use this when reconstituting entities from database.
    */
   static fromString(value: string): Password {
+    if (!this.isBcryptHash(value)) {
+      throw new ValidationError('password', 'Stored password must be a valid bcrypt hash')
+    }
+
     return new Password(value)
   }
 
@@ -114,5 +118,10 @@ export class Password {
    */
   equals(other: Password): boolean {
     return this.value === other.value
+  }
+
+  private static isBcryptHash(value: string): boolean {
+    const bcryptHashRegex = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/
+    return bcryptHashRegex.test(value)
   }
 }

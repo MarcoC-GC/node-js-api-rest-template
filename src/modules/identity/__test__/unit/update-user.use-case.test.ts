@@ -28,7 +28,7 @@ describe('UpdateUserUseCase', () => {
     return User.reconstitute({
       id: UserId.create(),
       email,
-      password: Password.fromString('$2b$10$hashed'),
+      password: Password.fromString('$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'),
       firstName: 'John',
       lastName: 'Doe',
       isActive: true,
@@ -135,7 +135,9 @@ describe('UpdateUserUseCase', () => {
     vi.mocked(mockUserRepository.findById).mockResolvedValue(Result.ok(user))
     vi.mocked(mockUserRepository.existsByEmail).mockResolvedValue(Result.ok(false))
     vi.mocked(mockRoleRepository.findById).mockResolvedValue(Result.ok(role))
-    vi.mocked(mockPasswordHashService.hash).mockResolvedValue('$2b$10$newhashed')
+    vi.mocked(mockPasswordHashService.hash).mockResolvedValue(
+      '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWz'
+    )
     vi.mocked(mockUserRepository.update).mockResolvedValue(Result.ok(undefined))
 
     const result = await useCase.execute(user.id.getValue(), {

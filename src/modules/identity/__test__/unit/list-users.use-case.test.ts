@@ -20,7 +20,7 @@ describe('ListUsersUseCase', () => {
     return User.reconstitute({
       id: UserId.create(),
       email,
-      password: Password.fromString('$2b$10$hashed'),
+      password: Password.fromString('$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'),
       firstName,
       lastName,
       isActive: true,

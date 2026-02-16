@@ -2,7 +2,7 @@ import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: ['./src/index.ts'],
-  target: 'node24',
+  target: 'node22',
   clean: true,
   unbundle: false,
   skipNodeModulesBundle: true,

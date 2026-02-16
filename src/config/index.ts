@@ -87,6 +87,10 @@ export class Config {
     return this.env.API_BASE_URL
   }
 
+  get apiDocsEnabled(): boolean {
+    return this.isDevelopment || this.env.ENABLE_API_DOCS
+  }
+
   // Logging Configuration
 
   get logLevel(): 'debug' | 'info' | 'warn' | 'error' {

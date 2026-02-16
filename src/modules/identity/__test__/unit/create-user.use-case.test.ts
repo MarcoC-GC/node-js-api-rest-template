@@ -113,7 +113,9 @@ describe('CreateUserUseCase', () => {
     const role = createRole()
     vi.mocked(mockUserRepository.existsByEmail).mockResolvedValue(Result.ok(false))
     vi.mocked(mockRoleRepository.findById).mockResolvedValue(Result.ok(role))
-    vi.mocked(mockPasswordHashService.hash).mockResolvedValue('$2b$10$hashed')
+    vi.mocked(mockPasswordHashService.hash).mockResolvedValue(
+      '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'
+    )
     vi.mocked(mockUserRepository.save).mockResolvedValue(Result.ok(undefined))
 
     const result = await useCase.execute({

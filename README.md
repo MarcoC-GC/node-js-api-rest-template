@@ -71,6 +71,7 @@ pnpm prisma:seed
 Base:
 
 - `NODE_ENV`, `PORT`, `API_BASE_URL`
+- `ENABLE_API_DOCS`
 - `DATABASE_URL`
 - `JWT_SECRET`, `JWT_EXPIRES_IN`
 - `BCRYPT_SALT_ROUNDS`
@@ -97,8 +98,8 @@ Seed:
 
 ## API Docs
 
-- OpenAPI JSON: `GET /api/docs/openapi.json`
-- UI (Scalar): `GET /api/docs`
+- OpenAPI JSON: `GET /api/docs/openapi.json` (si `ENABLE_API_DOCS=true` o en `development`)
+- UI (Scalar): `GET /api/docs` (si `ENABLE_API_DOCS=true` o en `development`)
 - Healthcheck: `GET /health`
 
 ## Estructura
